@@ -115,16 +115,11 @@ private statisticsService = inject(StatisticsService);
   }
 
   getCompletionRate(): number {
-    if (this.getTasks().length == 0) return 0;
-    return Math.round((this.getCompletedTasksCount() / this.getTasks().length) * 100);
+    return this.statisticsService.getCompletionRate();
   }
 
   getProductivityLevel(): string {
-    const rate = this.getCompletionRate();
-    if (rate >= 80) return 'excellent';
-    if (rate >= 60) return 'good';
-    if (rate >= 40) return 'needs-improvement';
-    return 'poor';
+    return this.statisticsService.getProductivityLevel();
   }
 
   onFieldFocus(field: string): void {
