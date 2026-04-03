@@ -6,7 +6,6 @@ import { FilterService } from '../services/filter-service';
 import { StatisticsService } from '../services/statistics-service';
 
 export interface Task {
-
   id: number;
   title: string;
   description: string;
@@ -26,11 +25,10 @@ export interface Task {
   styleUrl: './task-manager.css',
 })
 export class TaskManager {
-//service
-
-private taskService = inject(TaskService);
-private filterService = inject(FilterService)
-private statisticsService = inject(StatisticsService);
+  //Service
+  private taskService: TaskService = inject(TaskService);
+  private filterService: FilterService = inject(FilterService);
+  private statisticsService: StatisticsService = inject(StatisticsService);
 
 
   //Dropdown Options
@@ -55,52 +53,45 @@ private statisticsService = inject(StatisticsService);
       status: 'pending'
     };
 
-    //Getter ans Setter for filters
-    get filterStatus(): string 
-    {
-      return this.filterService.getStatusFilter();
-    }
 
-    set filterStatus(value: string) 
-    {      
-      this.filterService.setStatusFilter(value);
-    }
+  //Getter and setter properties for filters
+  get filterStatus(): string {
+    return this.filterService.getStatusFilter();
+  }
 
-    get filterCategory(): string 
-    {
-      return this.filterService.getCategoryFilter();
-    }
+  set filterStatus(value: string) {
+    this.filterService.setStatusFilter(value);
+  }
 
-    set filterCategory(value: string) 
-    {      
-      this.filterService.setCategoryFilter(value);
-    }
-    
-    get filterPriority(): string 
-    {
-      return this.filterService.getPriorityFilter();
-    }
+  get filterCategory(): string {
+    return this.filterService.getCategoryFilter();
+  }
 
-    set filterPriority(value: string) 
-    {      
-      this.filterService.setPriorityFilter(value);
-    }
+  set filterCategory(value: string) {
+    this.filterService.setCategoryFilter(value);
+  }
 
-    get showCompleted(): boolean 
-    {
-      return this.filterService.getShowCompleted();
-    }
+  get filterPriority(): string {
+    return this.filterService.getPriorityFilter();
+  }
 
-    set showCompleted(value: boolean) 
-    {      
-      this.filterService.setShowCompleted(value);
-    }
+  set filterPriority(value: string) {
+    this.filterService.setPriorityFilter(value);
+  }
+
+  get showCompleted(): boolean {
+    return this.filterService.getShowCompleted();
+  }
+
+  set showCompleted(value: boolean) {
+    this.filterService.setShowCompleted(value);
+  }
+
 
   //Methods
-    getTasks(): Task[] 
-    {
-      return this.taskService.getTasks();
-    }
+  getTasks(): Task[] {
+    return this.taskService.getTasks();
+  }
 
   getCompletedTasksCount(): number {
     return this.statisticsService.getCompletedTasksCount();

@@ -48,7 +48,7 @@
             <option value="all">All Status</option>
             @for (status of statuses; track status)
             {
-            <option [value]="status">{{status}}</option>
+            <option [value]="status">{{status | titlecase}}</option>
             }
         </select>
 
@@ -56,7 +56,7 @@
             <option value="all">All Categories</option>
             @for (category of categories; track category)
             {
-            <option [value]="category">{{category}}</option>
+            <option [value]="category">{{category | titlecase}}</option>
             }
         </select>
 
@@ -64,7 +64,7 @@
             <option value="all">All Priorities</option>
             @for (priority of priorities; track priority)
             {
-            <option [value]="priority">{{priority}}</option>
+            <option [value]="priority">{{priority | titlecase}}</option>
             }
         </select>
 
@@ -135,7 +135,7 @@
                     <option value="" disabled>Select Category</option>
                     @for (category of categories; track category)
                     {
-                    <option [value]="category">{{category}}</option>
+                    <option [value]="category">{{category | titlecase}}</option>
                     }
                 </select>
             </div>
@@ -145,7 +145,7 @@
                 <select [(ngModel)]="newTask.priority">
                     @for (priority of priorities; track priority)
                     {
-                    <option [value]="priority">{{priority}}</option>
+                    <option [value]="priority">{{priority | titlecase}}</option>
                     }
                 </select>
             </div>
@@ -160,7 +160,7 @@
                 <select [(ngModel)]="newTask.status">
                     @for (status of statuses; track status)
                     {
-                    <option [value]="status">{{status}}</option>
+                    <option [value]="status">{{status | titlecase}}</option>
                     }
                 </select>
             </div>
@@ -211,11 +211,11 @@
                     }
 
                     <div class="task-meta">
-                        <span [class]="'category-tag category-' + task.category">{{task.category}}</span>
-                        <span [class]="'status-badge status-' + task.status">{{task.status}}</span>
+                        <span [class]="'category-tag category-' + task.category">{{task.category | titlecase}}</span>
+                        <span [class]="'status-badge status-' + task.status">{{task.status | titlecase}}</span>
 
-                        <span [style.color]="isOverdue(task)? '#ef4444' : '#64748b'">Due:
-                            {{task.dueDate.toLocaleDateString()}}</span>
+                        <span [style.color]="isOverdue(task)? '#ef4444' : '#64748b'">Due: {{task.dueDate | date:
+                            'mediumDate'}}</span>
                     </div>
                 </div>
 
