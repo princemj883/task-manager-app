@@ -32,7 +32,6 @@ export class TaskManager implements OnInit {
   private filterService: FilterService = inject(FilterService);
   private statisticsService: StatisticsService = inject(StatisticsService);
   private tasksApiService: TaskApiService = inject(TaskApiService);
-  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
 
   //Dropdown Options
@@ -46,7 +45,6 @@ export class TaskManager implements OnInit {
     this.tasksApiService.getTasks()
     .subscribe((response: Task[]) => {
       this.tasksService.setTasks(response);
-      this.cdr.detectChanges();
     });
   }
 
