@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskService } from '../services/task-service';
 import { FilterService } from '../services/filter-service';
 import { StatisticsService } from '../services/statistics-service';
+import { TaskApiService } from '../services/task-api-service';
 
 export interface Task {
   id: number;
@@ -24,17 +25,30 @@ export interface Task {
   templateUrl: './task-manager.html',
   styleUrl: './task-manager.css',
 })
-export class TaskManager {
+
+export class TaskManager implements OnInit {
   //Service
-  private taskService: TaskService = inject(TaskService);
+  private tasksService: TaskService = inject(TaskService);
   private filterService: FilterService = inject(FilterService);
   private statisticsService: StatisticsService = inject(StatisticsService);
+  private tasksApiService: TaskApiService = inject(TaskApiService);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
 
   //Dropdown Options
   categories: string[] = ['work', 'personal', 'shopping', 'health', 'finance', 'education', 'other'];
   priorities: string[] = ['low', 'medium', 'high', 'urgent'];
   statuses: string[] = ['pending', 'in-progress', 'completed', 'cancelled'];
+
+  //Oninit
+  ngOnInit(): void 
+  {
+    this.tasksApiService.getTasks()
+    .subscribe((response: Task[]) => {
+      this.tasksService.setTasks(response);
+      this.cdr.detectChanges();
+    });
+  }
 
   //Form data
   newTask: {
@@ -90,7 +104,7 @@ export class TaskManager {
 
   //Methods
   getTasks(): Task[] {
-    return this.taskService.getTasks();
+    return this.tasksService.getTasks();
   }
 
   getCompletedTasksCount(): number {
@@ -137,7 +151,7 @@ export class TaskManager {
       createdAt: new Date()
     };
 
-    this.taskService.addTask(task);
+    this.tasksService.addTask(task);
     this.clearForm();
   }
 
@@ -175,7 +189,7 @@ export class TaskManager {
   }
 
   toggleTaskComplete(id: number): void {
-    this.taskService.toggleTaskComplete(id);
+    this.tasksService.toggleTaskComplete(id);
   }
 
   isOverdue(task: Task): boolean {
@@ -185,6 +199,6 @@ export class TaskManager {
   }
 
   deleteTask(id: number): void {
-    this.taskService.deleteTask(id);
+    this.tasksService.deleteTask(id);
   }
 }
