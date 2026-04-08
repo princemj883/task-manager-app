@@ -15,7 +15,7 @@ export interface Task {
   dueDate: Date;
   status: string;
   createdAt: Date;
-  completedAt?: Date;
+  completedAt?: Date | null;
 }
 
 
@@ -32,6 +32,7 @@ export class TaskManager implements OnInit {
   private filterService: FilterService = inject(FilterService);
   private statisticsService: StatisticsService = inject(StatisticsService);
   private tasksApiService: TaskApiService = inject(TaskApiService);
+  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
 
   //Dropdown Options
@@ -39,12 +40,33 @@ export class TaskManager implements OnInit {
   priorities: string[] = ['low', 'medium', 'high', 'urgent'];
   statuses: string[] = ['pending', 'in-progress', 'completed', 'cancelled'];
 
+  //Error and Loading Properties
+  errorMessage: string = '';
+  isLoadingTasks: boolean = false;
+  isAddingTask: boolean = false;
+  isUpdatingTask: boolean = false;
+  deletingTaskId: number | null = null;
+
   //Oninit
-  ngOnInit(): void 
-  {
+  ngOnInit(): void {
+    this.isLoadingTasks = true;
     this.tasksApiService.getTasks()
-    .subscribe((response: Task[]) => {
-      this.tasksService.setTasks(response);
+      .subscribe({
+        next: (response: Task[]) => {
+        this.tasksService.setTasks(response);
+        this.errorMessage = '';
+        this.isLoadingTasks = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+         this.errorMessage = 'Failed to load tasks. Please refresh the page.';
+         console.error('Error fetching tasks:', error);
+         this.isLoadingTasks = false;
+         this.cdr.detectChanges();
+      },
+      complete: () => {
+        console.log('Task loading completed');
+      }
     });
   }
 
@@ -149,8 +171,26 @@ export class TaskManager implements OnInit {
       createdAt: new Date()
     };
 
-    this.tasksService.addTask(task);
-    this.clearForm();
+    this.isAddingTask = true;
+    this.errorMessage = '';
+
+    this.tasksApiService.createTask(task)
+      .subscribe({next: (response: Task) => { 
+        this.tasksService.addTask(response);
+        this.clearForm();
+        this.cdr.detectChanges();
+        this.isAddingTask = false;
+        this.errorMessage
+      }, error: (error) => {
+        console.error('Error adding task:', error);
+        this.errorMessage = 'Failed to add task. Please try again.';
+        this.isAddingTask = false;
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        console.log('Add task operation completed');
+      } 
+    });
   }
 
   clearForm(): void {
@@ -187,7 +227,20 @@ export class TaskManager implements OnInit {
   }
 
   toggleTaskComplete(id: number): void {
-    this.tasksService.toggleTaskComplete(id);
+    this.tasksApiService.getTaskById(id)
+      .subscribe((response: Task) => {
+        const newStatus = response.status === 'completed' ? 'pending' : 'completed';
+        const updatedData: Task = {
+          ...response,
+          status: newStatus,
+          completedAt: newStatus === 'completed' ? new Date() : null
+        }
+        this.tasksApiService.updateTask(id, updatedData)
+          .subscribe((updatedTask: Task) => {
+            this.tasksService.toggleTaskComplete(updatedData.id);
+            this.cdr.detectChanges();
+          });
+      });
   }
 
   isOverdue(task: Task): boolean {
@@ -197,6 +250,12 @@ export class TaskManager implements OnInit {
   }
 
   deleteTask(id: number): void {
-    this.tasksService.deleteTask(id);
+    if (confirm('Are you sure to delete?')) {
+      this.tasksApiService.deleteTask(id)
+        .subscribe((response: any) => {
+          this.tasksService.deleteTask(id);
+          this.cdr.detectChanges();
+        });
+    }
   }
 }
